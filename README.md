@@ -6,15 +6,13 @@ Try it out: http://bx2901.ct8.pl:41693/
 ## Installing & running
 
 - Extract all files
-- Download latest version of PHP (version without use of PHP files soon): https://www.php.net/downloads.php
-- Extract PHP files to the same folder where you downloaded this repo's files
 - Go to start.js, and change clientPath variable to domain where you plan to keep your self-hosted client (not required, you can also clear variable's contents)
 - Open the console (Command Prompt/Terminal) in the directory with repository
-- Type: `npm install express request php-express`
+- Type: `npm install express request`
 - To run the client, type: `node start.js`
 To make sure everything works, try going to http://localhost/ in your browser and check if it works.
 
-If you need to change port the client listens to, you can in line 289 of start.js, just change the number `80` with your desired port.
+If you need to change port the client listens to, you can in line 279 of start.js, just change the number `80` with your desired port.
 
 ## Screenshots
 
