@@ -12,10 +12,6 @@ domain where you plan to keep your client , required for compatibility with IE4 
 (remember to add "/" at the end)
 */
 
-var phpExpress = require('php-express')({
-  binPath: 'php'
-});
-
 app.get('/', (req,res) => {
   res.redirect(clientPath + "index.html")
 });
@@ -33,7 +29,8 @@ app.get('/loader.php', (req,res) => {
       var username = JSON.parse(userinfo).username;
       var discrim = JSON.parse(userinfo).discriminator;
       var userid = JSON.parse(userinfo).id;
-      res.redirect(clientPath + "client.php?username=" + username + "&discrim=" + discrim + "&id=" + userid + "&auth=" + token)
+      renderedhtml = '<html>\n<head>\n<title>Discord Mobile - Browser</title>\n<meta charset="UTF-8">\n</head>\n<body>\n<p>Welcome, ' + username + '#'+ discrim +'<br><br>Your user ID: '+ userid +'</p>\n<a href="serverlist.php?auth='+ token +'">Go to your server list</a>\n<br>\n<a href="dms.php?auth='+ token +'">Go to your DMs</a>\n</body></html>'
+      res.send(renderedhtml);
   })
 });
 
@@ -279,12 +276,6 @@ app.get('/sendDM.php', (req,res) => {
    });
 });
 
-app.engine('php', phpExpress.engine);
-app.set('view engine', 'php');
-
-
-
-app.all(/.+\.php$/, phpExpress.router);
 app.use(express.static('./views'))
 var server = app.listen(80, function () {
 });
