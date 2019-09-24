@@ -12,7 +12,7 @@ Try it out: http://bx2901.ct8.pl:41693/
 - To run the client, type: `node start.js`
 To make sure everything works, try going to http://localhost/ in your browser and check if it works.
 
-If you need to change port the client listens to, you can in line 279 of start.js, just change the number `80` with your desired port.
+If you need to change port the client listens to, you can in line 312 of start.js, just change the number `80` with your desired port.
 
 ## Screenshots
 
