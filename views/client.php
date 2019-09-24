@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>Discord Mobile - Browser</title>
+        <title>LightDiscordClient</title>
         <meta charset="UTF-8">
     </head>
     <body>
