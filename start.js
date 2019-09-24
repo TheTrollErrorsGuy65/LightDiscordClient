@@ -29,17 +29,20 @@ app.get('/loader.php', (req,res) => {
         authorization: token
     }
     }, (error, response, body) => {
-      var userinfo = response.toJSON().body
+      try {
+        var userinfo = response.toJSON().body
       var username = JSON.parse(userinfo).username;
       var discrim = JSON.parse(userinfo).discriminator;
       var userid = JSON.parse(userinfo).id;
       res.redirect(clientPath + "client.php?username=" + username + "&discrim=" + discrim + "&id=" + userid + "&auth=" + token)
+      }
+      catch(error) {}
   })
 });
 
 app.get('/serverlist.php', (req,res) => {
   var token = req.originalUrl.split("?auth=")[1].replace(/\"/g, "")
-  var renderedhtml = '<html><head><title>Discord Mobile - Browser</title><meta charset="UTF-8"></head><body><p>Your server list:</p><br>'
+  var renderedhtml = '<html><head><title>LightDiscordClient</title><meta charset="UTF-8"></head><body><p>Your server list:</p><br>'
   request({
     method: 'get',
     url: 'https://discordapp.com/api/v6/users/@me/guilds',
@@ -48,18 +51,21 @@ app.get('/serverlist.php', (req,res) => {
     }
     }, (error, response, body) => {
       var userinfo = response.toJSON().body
-      var jsonified = JSON.parse(userinfo);
+      try {
+        var jsonified = JSON.parse(userinfo);
       jsonified.forEach(function(guild) {
         renderedhtml += '<a href="server.php?id=' + guild.id +'&auth=' + token + '">' + guild.name + '</a><br>'
       })
       renderedhtml += "<br><br><br><p>Want to join a server? Use form below!</p><br><form action='join.php' method='GET'><input type='text' placeholder='Invite code/link' name='invite'></input></input><input type='hidden' name='auth' value='"+ token +"'></input><input type='submit' value='Join!'></form></body></html>"
       res.send(renderedhtml)
+      }
+      catch(error) {}
   })
 });
 
 app.get('/server.php', (req,res) => {
   var token = req.originalUrl.split("&auth=")[1].replace(/\"/g, "")
-  var renderedhtml = '<html><head><title>Discord Mobile - Browser</title><meta charset="UTF-8"></head><body><p>List of channels for selected server</p><br>'
+  var renderedhtml = '<html><head><title>LightDiscordClient</title><meta charset="UTF-8"></head><body><p>List of channels for selected server</p><br>'
   request({
     method: 'get',
     url: 'https://discordapp.com/api/v6/guilds/' + req.originalUrl.split("?id=")[1].split("&auth=")[0] + '/channels',
@@ -68,6 +74,7 @@ app.get('/server.php', (req,res) => {
     }
     }, (error, response, body) => {
       var userinfo = response.toJSON().body
+     try {
       var jsonified = JSON.parse(userinfo);
       jsonified.forEach(function(channel) {
         if(channel.type == 0) {
@@ -82,13 +89,15 @@ app.get('/server.php', (req,res) => {
       })
       renderedhtml += "</body></html>"
       res.send(renderedhtml);
+     }
+     catch(error) {}
   })
 });
 
 app.get('/channel.php', (req,res) => {
   var token = req.originalUrl.split("&auth=")[1].replace(/\"/g, "")
   var channel = req.originalUrl.split("?id=")[1].split("&auth=")[0];
-  var renderedhtml = '<html><head><title>Discord Mobile - Browser</title><meta charset="UTF-8"></head><body><a href="serverlist.php?auth=' + token + '">Go back to server list</a><p>Last 50 messages<br>(if you want messages updated, just refresh the page)</p><br><form action="sendMessage.php" method="GET"><input type="text" name="message" autocomplete="off" placeholder="Want to talk?"><input type="hidden" name="id" value="' + channel + '"><input type="hidden" name="auth" value="'+ token +'"><input type="submit" value="Post"></form><br>'
+  var renderedhtml = '<html><head><title>LightDiscordClient</title><meta charset="UTF-8"></head><body><a href="serverlist.php?auth=' + token + '">Go back to server list</a><p>Last 50 messages<br>(if you want messages updated, just refresh the page)</p><br><form action="sendMessage.php" method="GET"><input type="text" name="message" autocomplete="off" placeholder="Want to talk?"><input type="hidden" name="id" value="' + channel + '"><input type="hidden" name="auth" value="'+ token +'"><input type="submit" value="Post"></form><br>'
   setTimeout(function() {
     request({
       method: 'get',
@@ -98,7 +107,8 @@ app.get('/channel.php', (req,res) => {
       }
       }, (error, response, body) => {
         var userinfo = response.toJSON().body
-        var jsonified = JSON.parse(userinfo);
+        try {
+          var jsonified = JSON.parse(userinfo);
         jsonified.forEach(function(message) {
           renderedhtml += "<p>" + message.author.username + "#" + message.author.discriminator + " wrote:<br>" + message.content
           message.attachments.forEach(function(attach) {
@@ -110,6 +120,8 @@ app.get('/channel.php', (req,res) => {
         })
         renderedhtml += "</body></html>"
         res.send(renderedhtml);
+        }
+        catch(error) {}
     })
   }, 2000)
 });
@@ -117,7 +129,7 @@ app.get('/channel.php', (req,res) => {
 
 app.get('/dms.php', (req,res) => {
   var token = req.originalUrl.split("?auth=")[1].replace(/\"/g, "")
-  var renderedhtml = '<html><head><title>Discord Mobile - Browser</title><meta charset="UTF-8"></head><body><p>List of your DMs</p><br>'
+  var renderedhtml = '<html><head><title>LightDiscordClient</title><meta charset="UTF-8"></head><body><p>List of your DMs</p><br>'
   request({
     method: 'get',
     url: 'https://discordapp.com/api/v6/users/@me/channels',
@@ -126,7 +138,8 @@ app.get('/dms.php', (req,res) => {
     }
     }, (error, response, body) => {
       var userinfo = response.toJSON().body
-      var jsonified = JSON.parse(userinfo);
+      try {
+        var jsonified = JSON.parse(userinfo);
       jsonified.forEach(function(user) {
         user.recipients.forEach(function(user2) {
           renderedhtml += "<a href='dm.php?id=" + user.id + "&auth="+ token +"'>"+ user2.username +"#"+ user2.discriminator +"</a><br>"
@@ -134,6 +147,8 @@ app.get('/dms.php', (req,res) => {
       })
       renderedhtml += '<p>Want to start DMs with someone? Do this here! (put their ID here)</p><form action="startdms.php" method="GET"><input type="text" name="id" autocomplete="off" placeholder="User ID..."><input type="hidden" name="auth" value="'+ token +'"><input type="submit" value="Start DMs"></form></body></html>'
       res.send(renderedhtml);
+      }
+      catch(error) {}
   })
 });
 
@@ -182,7 +197,7 @@ app.get('/startdms.php', (req,res) => {
 app.get('/dm.php', (req,res) => {
   var token = req.originalUrl.split("&auth=")[1].replace(/\"/g, "")
   var channel = req.originalUrl.split("?id=")[1].split("&auth=")[0];
-  var renderedhtml = '<html><head><title>Discord Mobile - Browser</title><meta charset="UTF-8"></head><body><a href="dms.php?auth=' + token + '">Go back to your DMs list</a><p>Last 50 messages<br>(if you want messages updated, just refresh the page)</p><br><form action="sendDM.php" method="GET"><input type="text" name="message" autocomplete="off" placeholder="Want to talk?"><input type="hidden" name="id" value="' + channel + '"><input type="hidden" name="auth" value="'+ token +'"><input type="submit" value="Post"></form><br>'
+  var renderedhtml = '<html><head><title>LightDiscordClient</title><meta charset="UTF-8"></head><body><a href="dms.php?auth=' + token + '">Go back to your DMs list</a><p>Last 50 messages<br>(if you want messages updated, just refresh the page)</p><br><form action="sendDM.php" method="GET"><input type="text" name="message" autocomplete="off" placeholder="Want to talk?"><input type="hidden" name="id" value="' + channel + '"><input type="hidden" name="auth" value="'+ token +'"><input type="submit" value="Post"></form><br>'
   setTimeout(function() {
     request({
       method: 'get',
@@ -192,7 +207,8 @@ app.get('/dm.php', (req,res) => {
       }
       }, (error, response, body) => {
         var userinfo = response.toJSON().body
-        var jsonified = JSON.parse(userinfo);
+        try {
+          var jsonified = JSON.parse(userinfo);
         jsonified.forEach(function(message) {
           renderedhtml += "<p>" + message.author.username + "#" + message.author.discriminator + " wrote:<br>" + message.content
           message.attachments.forEach(function(attach) {
@@ -204,6 +220,8 @@ app.get('/dm.php', (req,res) => {
         })
         renderedhtml += "</body></html>"
         res.send(renderedhtml);
+        }
+        catch(error){}
     })
   }, 2000)
 });
