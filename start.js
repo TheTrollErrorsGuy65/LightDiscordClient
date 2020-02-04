@@ -3,7 +3,7 @@ var fs = require('fs');
 var request = require("request"); // do requestów do api discorda
 
 var app = express();
-var clientPath = "http://bx2901.ct8.pl:41693/" /*domena na której planujesz trzymać klienta, wymagane dla kompatybilności z ie4 (i pewnie innymi starszymi przeglądarkami)
+var clientPath = "http://localhost/" /*domena na której planujesz trzymać klienta, wymagane dla kompatybilności z ie4 (i pewnie innymi starszymi przeglądarkami)
 
 (pamiętaj o dodaniu "/" na końcu)
 
@@ -14,6 +14,28 @@ domain where you plan to keep your client , required for compatibility with IE4 
 
 app.get('/', (req,res) => {
   res.redirect(clientPath + "index.html")
+});
+
+app.get('/login.php', (req,res) => {
+  let email = decodeURIComponent(req.originalUrl.split("?d=")[1].split("&d2")[0])
+  let password = decodeURIComponent(req.originalUrl.split("&d2=")[1])
+  console.log(email)
+  request({
+    method: 'post',
+    url: 'https://discordapp.com/api/v6/auth/login',
+    json: {
+        'email': email,
+        'password': password,
+        'Content-Type': 'application/json'
+    }
+    }, (error, response, body) => {
+      var userinfo = response.toJSON().body
+      console.log(userinfo);
+      try {
+        res.redirect(clientPath + "loader.php?d=" + userinfo.token)
+      }
+      catch(error) {}
+  })
 });
 
 app.get('/loader.php', (req,res) => {
@@ -297,15 +319,6 @@ app.get('/sendDM.php', (req,res) => {
 
      }
    });
-});
-
-app.get('/tokenerror', (req,res) => {
-  try {
-    res.send('<html><head><title>LightDiscordClient</title><meta charset="UTF-8"></head><body><p>We can\'t seem to retrieve data from Discord API using the token you provided.<br>Please obtain a new token to continue.<br><br>You can use the form below to enter your new token, and try reloading the client with it.</p><form action="loader.php" method="GET" width="500"><input type="text" autocomplete="off" width="500" placeholder="Paste token here." name="d"><input type="submit" value="Log in"></form></body></html>')
-  }
-  catch(error) {
-
-  }
 });
 
 app.use(express.static('./views'))
