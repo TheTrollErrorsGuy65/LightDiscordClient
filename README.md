@@ -1,8 +1,6 @@
 # LightDiscordClient
 Lightest Discord client ever - even working on Internet Explorer 4!
 
-Try it out: http://bx2901.ct8.pl:41693/
-
 ## Installing & running
 
 - Extract all files
